@@ -19,6 +19,13 @@ PDF_VIEWER = "evince"
 WEB_VIEWER = "google-chrome"
 DEFAULT_BIBTEX_FILE = "/home/ms/git/work_latex/library.bib"
 
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
 
 def parse_bibtex(bibfile):
     with open(bibfile, 'r') as bibtex_file:
@@ -132,7 +139,8 @@ elif args.t:
     ret = search_generic(b, 'title', key)
     evaluate_search(ret)
 elif args.l:
-    n_has_link = 0;
+    total_size = 0
+    n_has_link = 0
     print("\nListing all keys with links:\n")
     for key in sorted(b):
         value = b[key]
@@ -142,14 +150,16 @@ elif args.l:
             bibname = key
 
             if os.path.isfile(fname) == 1:
+                fsize = os.path.getsize(fname)
+                total_size += fsize
                 mtime = os.path.getmtime(fname)
                 dtime = datetime.datetime.fromtimestamp(int(mtime)).strftime('%Y-%m-%d %H:%M:%S')
-                print("[%s] %s (%s)" % (bibname, value['link'], dtime))
+                print("[%s] %s (%s) (%s)" % (bibname, value['link'], dtime, sizeof_fmt(fsize)))
                 n_has_link = n_has_link + 1
             else:
                 print("[%s] %s " % (bibname, value['link']))
 
     print("\n")
     print("total keys in file: ", len(b))
-    print("total keys in file with links: ", n_has_link)
+    print("total keys in file with links: %s (%s) " % (n_has_link, sizeof_fmt(total_size)))
 
