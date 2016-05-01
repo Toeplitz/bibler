@@ -65,6 +65,7 @@ def parse_bibtex(bibfile):
         db = bibtexparser.load(bibtex_file)
         return db.entries_dict
 
+
 def parse_argments(args):
     if args.k:
         key = args.k[0]
