@@ -59,14 +59,16 @@ def evaluate_search(ret):
         if 'link' in selected[1]:
             launch_viewer(selected[1]['link'])
         else:
-            print("No link in the selected bibtex item")
+            print("No link in the selected bibtex item, looking up on scholar...")
+            glink = "http://scholar.google.com/scholar?q=\"" + selected[1]['title'] + "\""
+            launch_viewer(glink)
     else:
         print("No match ...")
 
 
 def search_key(dictionary, substr):
     result = []
-    for key in dictionary:
+    for key in sorted(dictionary):
         str_match = '.*' + substr + '.*'
         m = re.match(str_match, key, re.IGNORECASE)
         if m:
@@ -76,7 +78,7 @@ def search_key(dictionary, substr):
 
 def search_generic(dictionary, bib_item, substr):
     result = []
-    for key in dictionary:
+    for key in sorted(dictionary):
         value = dictionary[key]
         str_match = '.*' + substr + '.*'
         m = re.match(str_match, value[bib_item], re.IGNORECASE)
@@ -132,7 +134,7 @@ elif args.t:
 elif args.l:
     n_has_link = 0;
     print("\nListing all keys with links:\n")
-    for key in b:
+    for key in sorted(b):
         value = b[key]
 
         if 'link' in value:
