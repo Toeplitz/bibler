@@ -11,6 +11,8 @@ import os.path
 import re
 import requests
 import sys 
+import datetime
+
 
 
 PDF_VIEWER = "evince"
@@ -89,6 +91,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-k', '-key', nargs=1, help="search for bibtex key")
 group.add_argument('-a', '-author', nargs=1, help="search for author")
 group.add_argument('-t', '-title', nargs=1, help="search for title")
+group.add_argument('-l', '-list', action='store_true', help="list all keys with links")
 args = parser.parse_args()
 
 if args.f == None:
@@ -126,4 +129,25 @@ elif args.t:
     key = args.t[0]
     ret = search_generic(b, 'title', key)
     evaluate_search(ret)
+elif args.l:
+    n_has_link = 0;
+    print("\nListing all keys with links:\n")
+    for key in b:
+        value = b[key]
+
+        if 'link' in value:
+            fname = value['link']
+            bibname = key
+
+            if os.path.isfile(fname) == 1:
+                mtime = os.path.getmtime(fname)
+                dtime = datetime.datetime.fromtimestamp(int(mtime)).strftime('%Y-%m-%d %H:%M:%S')
+                print("[%s] %s (%s)" % (bibname, value['link'], dtime))
+                n_has_link = n_has_link + 1
+            else:
+                print("[%s] %s " % (bibname, value['link']))
+
+    print("\n")
+    print("total keys in file: ", len(b))
+    print("total keys in file with links: ", n_has_link)
 
